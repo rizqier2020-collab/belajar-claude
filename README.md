@@ -108,20 +108,52 @@ ke backend port 8000 — lihat `vite.config.js`).
 ## 🐳 Setup — Docker (produksi)
 
 ```bash
-# Build & jalankan semua service (PostgreSQL + backend + frontend)
+# 1. Buat file .env di root project (sejajar docker-compose.yml)
+cp .env.example .env
+
+# 2. WAJIB isi nilai berikut di .env sebelum lanjut:
+#    - POSTGRES_PASSWORD  -> password database yang kuat
+#    - SECRET_KEY         -> generate: python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+#    - CORS_ORIGINS       -> domain/IP frontend Anda, contoh: http://203.0.113.10:3000
+
+# 3. Build & jalankan semua service (PostgreSQL + backend + frontend)
 docker compose up -d --build
 
-# Jalankan seeder sekali untuk mengisi data awal
+# 4. Jalankan seeder sekali untuk mengisi data awal
 docker compose exec backend python seed.py
 ```
 
-Akses:
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000 (docs di `/docs`)
-- **PostgreSQL**: localhost:5432
+Akses: **Frontend** di `http://<IP-server-Anda>:3000`.
 
-> ⚠️ **Produksi**: ganti `SECRET_KEY` di `docker-compose.yml` / `.env` dengan string acak.
-> Generate: `python -c "import secrets; print(secrets.token_urlsafe(48))"`
+> Tanpa `.env` terisi, `docker compose up` akan **menolak jalan** dengan pesan error
+> yang jelas — ini disengaja, supaya tidak ada yang lupa mengganti password/secret
+> default. PostgreSQL & backend API **tidak** di-expose langsung ke internet;
+> hanya frontend (port 3000) yang publik, dan ia meneruskan request `/api` ke
+> backend melalui jaringan internal Docker.
+
+> ⚠️ **Setelah seeder jalan**, segera login sebagai admin dan **ganti password**
+> semua akun contoh (default `password123`) lewat menu Manajemen User — jangan
+> biarkan password contoh dipakai di lingkungan produksi.
+
+---
+
+## ☁️ Deploy ke VPS (agar online 24 jam)
+
+Ringkasan langkah untuk menjalankan aplikasi ini di server cloud (DigitalOcean,
+Vultr, dsb.) sehingga bisa diakses dari mana saja, bukan cuma dari komputer lokal:
+
+1. **Sewa VPS** — pilih Ubuntu 22.04, spesifikasi minimal 1 vCPU / 2GB RAM sudah
+   cukup untuk skala ~10-15 pengguna. Pilih region terdekat (mis. Singapore).
+2. **Install Docker** di server (`curl -fsSL https://get.docker.com | sh`).
+3. **Clone repo** ke server: `git clone https://github.com/rizqier2020-collab/belajar-claude.git`
+4. Ikuti langkah **Setup — Docker (produksi)** di atas langsung di server (SSH).
+5. Buka **firewall** hanya untuk port yang perlu: `22` (SSH), `80`/`443` (nanti
+   untuk HTTPS), `3000` (sementara sebelum ada domain+HTTPS).
+6. (Opsional, sangat disarankan) Arahkan **domain** ke IP server, lalu pasang
+   **HTTPS** — cara termudah pakai [Caddy](https://caddyserver.com/) sebagai
+   reverse proxy otomatis-HTTPS di depan frontend.
+7. **Backup rutin**: volume `pgdata` (database) dan `uploads` (lampiran) —
+   jadwalkan `docker compose exec db pg_dump ...` secara berkala.
 
 ---
 

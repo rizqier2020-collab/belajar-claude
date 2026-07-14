@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+backend/.venv/
+backend/venv/
+*.db
+backend/jfp.db
+
+# Env
+.env
+backend/.env
+frontend/.env
+
+# Node
+node_modules/
+frontend/dist/
+
+# Uploads (kecuali sample)
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/sample-receipt.png
+
+# OS/editor
+.DS_Store
+*.log

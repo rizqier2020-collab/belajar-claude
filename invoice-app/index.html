@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplikasi Invoice Jasa</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-bar no-print">
+    <div class="app-bar__title">
+      <span class="app-bar__logo">🧾</span>
+      <div>
+        <h1>Aplikasi Invoice</h1>
+        <p>Buat, pratinjau, dan cetak invoice jasa dengan mudah</p>
+      </div>
+    </div>
+    <div class="app-bar__actions">
+      <button type="button" id="btn-example" class="btn btn--ghost">Isi Contoh</button>
+      <button type="button" id="btn-reset" class="btn btn--ghost">Kosongkan</button>
+      <button type="button" id="btn-export" class="btn btn--ghost">Ekspor JSON</button>
+      <label class="btn btn--ghost" for="file-import">Impor JSON</label>
+      <input type="file" id="file-import" accept="application/json" hidden />
+      <button type="button" id="btn-print" class="btn btn--primary">Cetak / Simpan PDF</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ===================== FORM ===================== -->
+    <section class="panel form-panel no-print" aria-label="Formulir invoice">
+      <form id="invoice-form">
+
+        <fieldset>
+          <legend>Penerbit (Dari)</legend>
+          <label>Nama Perusahaan
+            <input type="text" name="fromName" placeholder="PT. Jasa Ferrie Pratama" />
+          </label>
+          <label>Alamat / Baris tambahan
+            <textarea name="fromAddress" rows="2" placeholder="Alamat perusahaan penerbit"></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Detail Invoice</legend>
+          <div class="grid-2">
+            <label>No. Invoice
+              <input type="text" name="invoiceNo" placeholder="J/26-VI/18" />
+            </label>
+            <label>Tanggal
+              <input type="text" name="invoiceDate" placeholder="17 Juni 2026" />
+            </label>
+          </div>
+          <label>Jatuh tempo (hari sejak tanggal faktur)
+            <input type="number" name="dueDays" min="0" step="1" placeholder="14" />
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Ditagihkan Kepada (Kepada Yth.)</legend>
+          <label>Nama Perusahaan / Instansi
+            <input type="text" name="toName" placeholder="PT. Affinity Health Indonesia" />
+          </label>
+          <label>Baris ke-2 (opsional)
+            <input type="text" name="toName2" placeholder="RS. Premier Jatinegara" />
+          </label>
+          <label>Alamat
+            <textarea name="toAddress" rows="2" placeholder="Jl. Raya Jatinegara Timur No. 85-87, Jakarta 13310"></textarea>
+          </label>
+          <div class="grid-2">
+            <label>Attn (Nama)
+              <input type="text" name="attnName" placeholder="dr. Yustinus Hendry Yogatama, MM" />
+            </label>
+            <label>Attn (Jabatan)
+              <input type="text" name="attnTitle" placeholder="Director" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Proyek &amp; Kontrak</legend>
+          <label>Referensi Proyek
+            <input type="text" name="projectRef" placeholder="32504 : RS. PREMIER JATINEGARA : SUMUR RESAPAN : JAKARTA" />
+          </label>
+          <div class="grid-2">
+            <label>Tanggal Kontrak
+              <input type="text" name="contractDate" placeholder="29 Agustus 2025" />
+            </label>
+            <label>No. Kontrak
+              <input type="text" name="contractNo" placeholder="32504/JFP-RSPJ/043/VIII/2025" />
+            </label>
+          </div>
+          <label>Kalimat Pembuka (opsional)
+            <textarea name="intro" rows="3" placeholder="Kalimat pengantar tagihan. Kosongkan untuk memakai teks standar."></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Rincian Tagihan</legend>
+          <label>Nilai Total Kontrak (informasi)
+            <input type="number" name="contractTotal" min="0" step="1" placeholder="66500000" />
+          </label>
+
+          <div class="items-head">
+            <span>Deskripsi</span>
+            <span>Jumlah (Rp)</span>
+            <span></span>
+          </div>
+          <div id="items"></div>
+          <button type="button" id="btn-add-item" class="btn btn--ghost btn--sm">+ Tambah Baris</button>
+
+          <div class="grid-2 mt">
+            <label>PPN (%)
+              <input type="number" name="ppnRate" min="0" step="0.01" placeholder="11" />
+            </label>
+            <div class="totals-mini">
+              <div><span>Subtotal (DPP)</span><b id="mini-subtotal">Rp 0</b></div>
+              <div><span>PPN</span><b id="mini-ppn">Rp 0</b></div>
+              <div class="totals-mini__grand"><span>Total</span><b id="mini-total">Rp 0</b></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Pembayaran &amp; Tanda Tangan</legend>
+          <label>Nama Penandatangan
+            <input type="text" name="signName" placeholder="Ir. Noordian Moeloek, M.Sc" />
+          </label>
+          <label>Nama Perusahaan (Rekening)
+            <input type="text" name="bankHolder" placeholder="PT. JASA FERRIE PRATAMA" />
+          </label>
+          <div class="grid-2">
+            <label>No. Rekening
+              <input type="text" name="bankAccount" placeholder="0011812342" />
+            </label>
+            <label>Bank
+              <input type="text" name="bankName" placeholder="PT. Bank Negara Indonesia (Persero) Tbk" />
+            </label>
+          </div>
+          <label>Cabang / Alamat Bank
+            <textarea name="bankBranch" rows="2" placeholder="Cabang Dukuh Bawah-Capem Setiabudi, Jl. HR. Rasuna Said Kav. 62, Jakarta 12920"></textarea>
+          </label>
+        </fieldset>
+      </form>
+    </section>
+
+    <!-- ===================== PREVIEW ===================== -->
+    <section class="panel preview-panel" aria-label="Pratinjau invoice">
+      <div id="invoice" class="invoice">
+        <div class="invoice__header">
+          <div>
+            <div class="invoice__from" id="p-fromName">PT. Jasa Ferrie Pratama</div>
+            <div class="invoice__from-addr" id="p-fromAddress"></div>
+          </div>
+          <div class="invoice__title">
+            <h2>INVOICE</h2>
+            <table class="invoice__meta">
+              <tr><td>No.</td><td>:</td><td id="p-invoiceNo"></td></tr>
+              <tr><td>Tanggal</td><td>:</td><td id="p-invoiceDate"></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="invoice__to">
+          <div id="p-toName" class="strong"></div>
+          <div id="p-toName2"></div>
+          <div id="p-toAddress" class="pre"></div>
+          <div id="p-attn" class="invoice__attn"></div>
+        </div>
+
+        <div class="invoice__ref">
+          <span class="strong">Re: </span><span id="p-projectRef"></span>
+        </div>
+
+        <p class="invoice__intro" id="p-intro"></p>
+
+        <table class="invoice__items">
+          <thead>
+            <tr><th>Deskripsi</th><th class="num">Jumlah</th></tr>
+          </thead>
+          <tbody id="p-items"></tbody>
+          <tfoot>
+            <tr><td class="num strong">Subtotal (DPP)</td><td class="num" id="p-subtotal"></td></tr>
+            <tr><td class="num" id="p-ppnLabel">PPN</td><td class="num" id="p-ppn"></td></tr>
+            <tr class="grand"><td class="num strong">TOTAL</td><td class="num strong" id="p-total"></td></tr>
+          </tfoot>
+        </table>
+
+        <div class="invoice__terbilang">
+          <span class="strong">Terbilang: </span><span id="p-terbilang" class="italic"></span>
+        </div>
+
+        <p class="invoice__terms" id="p-terms"></p>
+
+        <div class="invoice__footer">
+          <div class="invoice__bank">
+            <div class="strong">Mohon pembayaran ditransfer ke Rekening:</div>
+            <div id="p-bankHolder" class="strong"></div>
+            <div id="p-bankAccount"></div>
+            <div id="p-bankName"></div>
+            <div id="p-bankBranch" class="pre"></div>
+          </div>
+          <div class="invoice__sign">
+            <div>Hormat kami,</div>
+            <div id="p-signCompany" class="strong"></div>
+            <div class="invoice__sign-space"></div>
+            <div id="p-signName" class="invoice__sign-name"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-foot no-print">
+    Data tersimpan otomatis di browser Anda (localStorage). Gunakan "Cetak / Simpan PDF" lalu pilih <em>Save as PDF</em>.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+:root {
+  --bg: #eef1f6;
+  --panel: #ffffff;
+  --ink: #1a2230;
+  --muted: #64708a;
+  --line: #d8deea;
+  --brand: #1f4e8c;
+  --brand-dark: #16386a;
+  --accent: #0f766e;
+  --danger: #b42318;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(16, 24, 40, .08), 0 8px 24px rgba(16, 24, 40, .06);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+/* ---------- App bar ---------- */
+.app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.app-bar__title { display: flex; align-items: center; gap: 12px; }
+.app-bar__logo { font-size: 30px; }
+.app-bar h1 { margin: 0; font-size: 19px; }
+.app-bar p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+.app-bar__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  font: inherit;
+  font-size: 13.5px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #f6f8fc;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .05s;
+}
+.btn:hover { background: #eef2f9; }
+.btn:active { transform: translateY(1px); }
+.btn--primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn--primary:hover { background: var(--brand-dark); }
+.btn--ghost { background: #fff; }
+.btn--sm { padding: 6px 10px; font-size: 12.5px; }
+
+/* ---------- Layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(340px, 460px) 1fr;
+  gap: 20px;
+  padding: 20px;
+  align-items: start;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.form-panel { padding: 18px; position: sticky; top: 78px; max-height: calc(100vh - 98px); overflow-y: auto; }
+
+/* ---------- Form ---------- */
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px 14px;
+  margin: 0 0 16px;
+}
+legend { font-weight: 600; font-size: 13px; color: var(--brand); padding: 0 6px; }
+label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+input, textarea, select {
+  width: 100%;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fcfdff;
+}
+input:focus, textarea:focus { outline: 2px solid rgba(31, 78, 140, .25); border-color: var(--brand); }
+textarea { resize: vertical; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mt { margin-top: 6px; }
+
+/* line items rows */
+.items-head, .item-row {
+  display: grid;
+  grid-template-columns: 1fr 130px 34px;
+  gap: 8px;
+  align-items: center;
+}
+.items-head { font-size: 11.5px; color: var(--muted); margin: 6px 0 4px; }
+.item-row { margin-bottom: 8px; }
+.item-row input { margin-top: 0; }
+.item-del {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--danger);
+  border-radius: 7px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+.item-del:hover { background: #fdecec; }
+
+.totals-mini { font-size: 13px; align-self: end; }
+.totals-mini > div { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
+.totals-mini__grand { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 6px !important; font-size: 15px; }
+
+/* ---------- Preview / Invoice ---------- */
+.preview-panel { padding: 24px; overflow-x: auto; }
+.invoice {
+  background: #fff;
+  color: #111;
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 22mm 18mm;
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 12.5pt;
+  border: 1px solid var(--line);
+}
+.invoice__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  border-bottom: 2px solid #222;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+.invoice__from { font-size: 15pt; font-weight: 700; }
+.invoice__from-addr { font-size: 10.5pt; color: #333; white-space: pre-line; margin-top: 2px; }
+.invoice__title { text-align: right; }
+.invoice__title h2 { margin: 0 0 6px; letter-spacing: 3px; font-size: 22pt; }
+.invoice__meta { font-size: 11.5pt; margin-left: auto; }
+.invoice__meta td { padding: 0 4px; text-align: left; vertical-align: top; }
+
+.invoice__to { margin-bottom: 14px; line-height: 1.5; }
+.invoice__attn { margin-top: 4px; }
+
+.invoice__ref { margin: 14px 0; }
+.invoice__intro { text-align: justify; margin: 10px 0 18px; }
+
+.invoice__items {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 6px;
+}
+.invoice__items th, .invoice__items td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #cfcfcf;
+}
+.invoice__items thead th { background: #f0f3f8; text-align: left; border-bottom: 1.5px solid #888; }
+.invoice__items .num { text-align: right; white-space: nowrap; }
+.invoice__items tfoot td { border-bottom: none; padding: 4px 10px; }
+.invoice__items tfoot tr.grand td { border-top: 2px solid #222; padding-top: 8px; font-size: 13.5pt; }
+
+.invoice__terbilang { margin: 12px 0 18px; }
+.invoice__terms { margin: 6px 0 26px; }
+
+.invoice__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 20px;
+}
+.invoice__bank { font-size: 11pt; line-height: 1.5; }
+.invoice__sign { text-align: left; min-width: 220px; }
+.invoice__sign-space { height: 64px; }
+.invoice__sign-name { font-weight: 700; text-decoration: underline; }
+
+.strong { font-weight: 700; }
+.italic { font-style: italic; }
+.pre { white-space: pre-line; }
+
+.app-foot { text-align: center; color: var(--muted); font-size: 12px; padding: 8px 20px 28px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .form-panel { position: static; max-height: none; }
+  .invoice { padding: 16mm 12mm; }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .layout { display: block; padding: 0; margin: 0; max-width: none; }
+  .panel { border: none; box-shadow: none; }
+  .preview-panel { padding: 0; overflow: visible; }
+  .invoice { width: auto; min-height: auto; border: none; padding: 0; font-size: 12pt; }
+  @page { size: A4; margin: 16mm; }
+}

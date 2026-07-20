@@ -1,0 +1,1035 @@
+<title>Aplikasi Invoice — PT. Jasa Ferrie Pratama</title>
+<style>
+:root {
+  --bg: #eef1f6;
+  --panel: #ffffff;
+  --ink: #1a2230;
+  --muted: #64708a;
+  --line: #d8deea;
+  --brand: #1f4e8c;
+  --brand-dark: #16386a;
+  --accent: #0f766e;
+  --danger: #b42318;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(16, 24, 40, .08), 0 8px 24px rgba(16, 24, 40, .06);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+/* ---------- App bar ---------- */
+.app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.app-bar__title { display: flex; align-items: center; gap: 12px; }
+.app-bar__logo { font-size: 30px; }
+.app-bar h1 { margin: 0; font-size: 19px; }
+.app-bar p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+.app-bar__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  font: inherit;
+  font-size: 13.5px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #f6f8fc;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .05s;
+}
+.btn:hover { background: #eef2f9; }
+.btn:active { transform: translateY(1px); }
+.btn--primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn--primary:hover { background: var(--brand-dark); }
+.btn--ghost { background: #fff; }
+.btn--sm { padding: 6px 10px; font-size: 12.5px; }
+
+/* ---------- Layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(340px, 460px) 1fr;
+  gap: 20px;
+  padding: 20px;
+  align-items: start;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.form-panel { padding: 18px; position: sticky; top: 78px; max-height: calc(100vh - 98px); overflow-y: auto; }
+
+/* ---------- Form ---------- */
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px 14px;
+  margin: 0 0 16px;
+}
+legend { font-weight: 600; font-size: 13px; color: var(--brand); padding: 0 6px; }
+label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+input, textarea, select {
+  width: 100%;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink);
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fcfdff;
+}
+input:focus, textarea:focus { outline: 2px solid rgba(31, 78, 140, .25); border-color: var(--brand); }
+textarea { resize: vertical; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mt { margin-top: 6px; }
+
+.logo-preview-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #f6f8fc;
+}
+.logo-preview-wrap img { max-height: 56px; max-width: 100px; object-fit: contain; }
+.color-input { height: 38px; padding: 3px; cursor: pointer; }
+
+/* line items rows */
+.items-head, .item-row {
+  display: grid;
+  grid-template-columns: 1fr 130px 34px;
+  gap: 8px;
+  align-items: center;
+}
+.items-head { font-size: 11.5px; color: var(--muted); margin: 6px 0 4px; }
+.item-row { margin-bottom: 8px; }
+.item-row input { margin-top: 0; }
+.item-del {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--danger);
+  border-radius: 7px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+.item-del:hover { background: #fdecec; }
+
+.totals-mini { font-size: 13px; align-self: end; }
+.totals-mini > div { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
+.totals-mini__grand { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 6px !important; font-size: 15px; }
+
+/* ---------- Preview / Invoice ---------- */
+.preview-panel { padding: 24px; overflow-x: auto; }
+.invoice {
+  background: #fff;
+  color: #111;
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 22mm 18mm;
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 12.5pt;
+  border: 1px solid var(--line);
+}
+/* ----- Kop surat / letterhead ----- */
+.invoice__letterhead {
+  --lh-accent: #f5851f;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2.5px solid var(--lh-accent);
+  margin-bottom: 4px;
+}
+.invoice__logo {
+  max-height: 80px;
+  max-width: 130px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+.invoice__lh-text { flex: 1 1 auto; }
+.invoice__from {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 21pt;
+  font-weight: 800;
+  letter-spacing: .5px;
+  line-height: 1.05;
+  color: var(--lh-accent);
+}
+.invoice__tagline {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--lh-accent);
+  margin-top: 1px;
+}
+.invoice__from-addr {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: var(--lh-accent);
+  filter: brightness(1.08);
+  white-space: pre-line;
+  margin-top: 6px;
+}
+.invoice__contacts {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: var(--lh-accent);
+  filter: brightness(1.08);
+  margin-top: 2px;
+}
+.invoice__contacts span + span::before { content: ",  "; }
+
+.invoice__header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px;
+  margin: 14px 0 18px;
+}
+.invoice__title { text-align: left; }
+.invoice__meta { font-size: 11.5pt; }
+.invoice__meta td { padding: 0 4px 0 0; text-align: left; vertical-align: top; }
+.invoice__meta td:first-child { min-width: 62px; }
+
+.invoice__to { margin-bottom: 14px; line-height: 1.5; }
+.invoice__attn { margin-top: 4px; }
+
+.invoice__ref { margin: 14px 0; }
+.invoice__intro { text-align: justify; margin: 10px 0 18px; }
+
+.invoice__items {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 6px;
+}
+.invoice__items th, .invoice__items td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #cfcfcf;
+}
+.invoice__items thead th { background: #f0f3f8; text-align: left; border-bottom: 1.5px solid #888; }
+.invoice__items .num { text-align: right; white-space: nowrap; }
+.invoice__items tfoot td { border-bottom: none; padding: 4px 10px; }
+.invoice__items tfoot tr.grand td { border-top: 2px solid #222; padding-top: 8px; font-size: 13.5pt; }
+
+.invoice__terbilang { margin: 12px 0 18px; }
+.invoice__terms { margin: 6px 0 26px; }
+
+.invoice__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 20px;
+}
+.invoice__bank { font-size: 11pt; line-height: 1.5; }
+.invoice__sign { text-align: left; min-width: 220px; }
+.invoice__sign-space { height: 64px; }
+.invoice__sign-name { font-weight: 700; text-decoration: underline; }
+
+.strong { font-weight: 700; }
+.italic { font-style: italic; }
+.pre { white-space: pre-line; }
+
+/* ---------- Kwitansi / Receipt ---------- */
+.rcpt__head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 18px 0 26px;
+}
+.rcpt__title { margin: 0 0 8px; letter-spacing: 3px; font-size: 20pt; }
+.rcpt__meta { font-size: 11.5pt; }
+.rcpt__meta td { padding: 0 4px 0 0; vertical-align: top; }
+.rcpt__body { width: 100%; border-collapse: collapse; margin: 10px 0 30px; }
+.rcpt__body td { padding: 8px 6px; vertical-align: top; }
+.rcpt__label { width: 165px; white-space: nowrap; }
+.rcpt__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+  margin-top: 40px;
+}
+.rcpt__amount {
+  border: 2px solid #222;
+  padding: 12px 18px;
+  font-size: 14pt;
+  font-weight: 700;
+  min-width: 230px;
+}
+.rcpt__sign { text-align: center; min-width: 230px; }
+
+/* ---------- Tanda Terima ---------- */
+.tt__title { text-align: center; letter-spacing: 3px; font-size: 17pt; margin: 20px 0 24px; }
+.tt__signs {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 46px;
+}
+.tt__sign { text-align: center; min-width: 220px; }
+.tt__line { margin-top: 4px; }
+
+.app-foot { text-align: center; color: var(--muted); font-size: 12px; padding: 8px 20px 28px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .form-panel { position: static; max-height: none; }
+  .invoice { padding: 16mm 12mm; }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .invoice__letterhead, .invoice__from, .invoice__tagline,
+  .invoice__from-addr, .invoice__contacts, .invoice__logo {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .layout { display: block; padding: 0; margin: 0; max-width: none; }
+  .panel { border: none; box-shadow: none; }
+  .preview-panel { padding: 0; overflow: visible; }
+  .invoice { width: auto; min-height: auto; border: none; padding: 0; font-size: 12pt; }
+  @page { size: A4; margin: 16mm; }
+}
+
+</style>
+<header class="app-bar no-print">
+    <div class="app-bar__title">
+      <span class="app-bar__logo">🧾</span>
+      <div>
+        <h1>Aplikasi Invoice</h1>
+        <p>Buat, pratinjau, dan cetak invoice jasa dengan mudah</p>
+      </div>
+    </div>
+    <div class="app-bar__actions">
+      <button type="button" id="btn-example" class="btn btn--ghost">Isi Contoh</button>
+      <button type="button" id="btn-reset" class="btn btn--ghost">Kosongkan</button>
+      <button type="button" id="btn-export" class="btn btn--ghost">Ekspor JSON</button>
+      <label class="btn btn--ghost" for="file-import">Impor JSON</label>
+      <input type="file" id="file-import" accept="application/json" hidden />
+      <button type="button" id="btn-print" class="btn btn--primary">Cetak / Simpan PDF</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ===================== FORM ===================== -->
+    <section class="panel form-panel no-print" aria-label="Formulir invoice">
+      <form id="invoice-form">
+
+        <fieldset>
+          <legend>Jenis Dokumen</legend>
+          <label>Buat dokumen
+            <select name="docType" id="doc-type">
+              <option value="invoice">Invoice</option>
+              <option value="receipt">Kwitansi (Receipt)</option>
+              <option value="tandaterima">Tanda Terima</option>
+            </select>
+          </label>
+          <div class="grid-2" id="receipt-fields">
+            <label>Judul Kwitansi
+              <input type="text" name="receiptTitle" placeholder="RECEIPT" />
+            </label>
+            <label>No. Kwitansi
+              <input type="text" name="receiptNo" placeholder="054624" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Kop Surat / Penerbit</legend>
+          <label>Logo Perusahaan
+            <input type="file" id="logo-input" accept="image/*" />
+          </label>
+          <div id="logo-preview-wrap" class="logo-preview-wrap" hidden>
+            <img id="logo-preview" alt="Pratinjau logo" />
+            <button type="button" id="btn-remove-logo" class="btn btn--ghost btn--sm">Hapus logo</button>
+          </div>
+          <label>Nama Perusahaan
+            <input type="text" name="fromName" placeholder="PT. JASA FERRIE PRATAMA" />
+          </label>
+          <div class="grid-2">
+            <label>Tagline / Bidang Usaha
+              <input type="text" name="tagline" placeholder="ARCHITECTURE CONSULTANT" />
+            </label>
+            <label>Warna Kop
+              <input type="color" name="brandColor" value="#f5851f" class="color-input" />
+            </label>
+          </div>
+          <label>Alamat
+            <textarea name="fromAddress" rows="2" placeholder="WISMA YAKYF, Lantai 2 Jl. Hj. Tutty Alawiyah, Jakarta Selatan"></textarea>
+          </label>
+          <div class="grid-2">
+            <label>Telepon / WA
+              <input type="text" name="fromPhone" placeholder="+62 813 1818 299" />
+            </label>
+            <label>Email
+              <input type="text" name="fromEmail" placeholder="mail@jfp.co.id" />
+            </label>
+          </div>
+          <label>Website
+            <input type="text" name="fromWeb" placeholder="www.jfp.co.id" />
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Detail Invoice</legend>
+          <div class="grid-2">
+            <label>No. Invoice
+              <input type="text" name="invoiceNo" placeholder="J/26-VI/18" />
+            </label>
+            <label>Tanggal
+              <input type="text" name="invoiceDate" placeholder="17 Juni 2026" />
+            </label>
+          </div>
+          <label>Jatuh tempo (hari sejak tanggal faktur)
+            <input type="number" name="dueDays" min="0" step="1" placeholder="14" />
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Ditagihkan Kepada (Kepada Yth.)</legend>
+          <label>Nama Perusahaan / Instansi
+            <input type="text" name="toName" placeholder="PT. Affinity Health Indonesia" />
+          </label>
+          <label>Baris ke-2 (opsional)
+            <input type="text" name="toName2" placeholder="RS. Premier Jatinegara" />
+          </label>
+          <label>Alamat
+            <textarea name="toAddress" rows="2" placeholder="Jl. Raya Jatinegara Timur No. 85-87, Jakarta 13310"></textarea>
+          </label>
+          <div class="grid-2">
+            <label>Attn (Nama)
+              <input type="text" name="attnName" placeholder="dr. Yustinus Hendry Yogatama, MM" />
+            </label>
+            <label>Attn (Jabatan)
+              <input type="text" name="attnTitle" placeholder="Director" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Proyek &amp; Kontrak</legend>
+          <label>Referensi Proyek
+            <input type="text" name="projectRef" placeholder="32504 : RS. PREMIER JATINEGARA : SUMUR RESAPAN : JAKARTA" />
+          </label>
+          <div class="grid-2">
+            <label>Tanggal Kontrak
+              <input type="text" name="contractDate" placeholder="29 Agustus 2025" />
+            </label>
+            <label>No. Kontrak
+              <input type="text" name="contractNo" placeholder="32504/JFP-RSPJ/043/VIII/2025" />
+            </label>
+          </div>
+          <label>Kalimat Pembuka (opsional)
+            <textarea name="intro" rows="3" placeholder="Kalimat pengantar tagihan. Kosongkan untuk memakai teks standar."></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Rincian Tagihan</legend>
+          <label>Nilai Total Kontrak (informasi)
+            <input type="number" name="contractTotal" min="0" step="1" placeholder="66500000" />
+          </label>
+
+          <div class="items-head">
+            <span>Deskripsi</span>
+            <span>Jumlah (Rp)</span>
+            <span></span>
+          </div>
+          <div id="items"></div>
+          <button type="button" id="btn-add-item" class="btn btn--ghost btn--sm">+ Tambah Baris</button>
+
+          <div class="grid-2 mt">
+            <label>PPN (%)
+              <input type="number" name="ppnRate" min="0" step="0.01" placeholder="11" />
+            </label>
+            <div class="totals-mini">
+              <div><span>Subtotal (DPP)</span><b id="mini-subtotal">Rp 0</b></div>
+              <div><span>PPN</span><b id="mini-ppn">Rp 0</b></div>
+              <div class="totals-mini__grand"><span>Total</span><b id="mini-total">Rp 0</b></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Pembayaran &amp; Tanda Tangan</legend>
+          <label>Nama Penandatangan
+            <input type="text" name="signName" placeholder="Ir. Noordian Moeloek, M.Sc" />
+          </label>
+          <label>Nama Perusahaan (Rekening)
+            <input type="text" name="bankHolder" placeholder="PT. JASA FERRIE PRATAMA" />
+          </label>
+          <div class="grid-2">
+            <label>No. Rekening
+              <input type="text" name="bankAccount" placeholder="0011812342" />
+            </label>
+            <label>Bank
+              <input type="text" name="bankName" placeholder="PT. Bank Negara Indonesia (Persero) Tbk" />
+            </label>
+          </div>
+          <label>Cabang / Alamat Bank
+            <textarea name="bankBranch" rows="2" placeholder="Cabang Dukuh Bawah-Capem Setiabudi, Jl. HR. Rasuna Said Kav. 62, Jakarta 12920"></textarea>
+          </label>
+        </fieldset>
+      </form>
+    </section>
+
+    <!-- ===================== PREVIEW ===================== -->
+    <section class="panel preview-panel" aria-label="Pratinjau invoice">
+      <div id="invoice" class="invoice">
+        <!-- ===== KOP SURAT / LETTERHEAD ===== -->
+        <div class="invoice__letterhead" id="p-letterhead">
+          <img class="invoice__logo" id="p-logo" alt="Logo perusahaan" hidden />
+          <div class="invoice__lh-text">
+            <div class="invoice__from" id="p-fromName">PT. JASA FERRIE PRATAMA</div>
+            <div class="invoice__tagline" id="p-tagline"></div>
+            <div class="invoice__from-addr" id="p-fromAddress"></div>
+            <div class="invoice__contacts" id="p-contacts"></div>
+          </div>
+        </div>
+
+        <div id="doc-invoice" class="doc">
+        <div class="invoice__header">
+          <div class="invoice__title">
+            <table class="invoice__meta">
+              <tr><td>No.</td><td>:</td><td id="p-invoiceNo"></td></tr>
+              <tr><td>Tanggal</td><td>:</td><td id="p-invoiceDate"></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="invoice__to">
+          <div id="p-toName" class="strong"></div>
+          <div id="p-toName2"></div>
+          <div id="p-toAddress" class="pre"></div>
+          <div id="p-attn" class="invoice__attn"></div>
+        </div>
+
+        <div class="invoice__ref">
+          <span class="strong">Re: </span><span id="p-projectRef"></span>
+        </div>
+
+        <p class="invoice__intro" id="p-intro"></p>
+
+        <table class="invoice__items">
+          <thead>
+            <tr><th>Deskripsi</th><th class="num">Jumlah</th></tr>
+          </thead>
+          <tbody id="p-items"></tbody>
+          <tfoot>
+            <tr><td class="num strong">Subtotal (DPP)</td><td class="num" id="p-subtotal"></td></tr>
+            <tr><td class="num" id="p-ppnLabel">PPN</td><td class="num" id="p-ppn"></td></tr>
+            <tr class="grand"><td class="num strong">TOTAL</td><td class="num strong" id="p-total"></td></tr>
+          </tfoot>
+        </table>
+
+        <div class="invoice__terbilang">
+          <span class="strong">Terbilang: </span><span id="p-terbilang" class="italic"></span>
+        </div>
+
+        <p class="invoice__terms" id="p-terms"></p>
+
+        <div class="invoice__footer">
+          <div class="invoice__bank">
+            <div class="strong">Mohon pembayaran ditransfer ke Rekening:</div>
+            <div id="p-bankHolder" class="strong"></div>
+            <div id="p-bankAccount"></div>
+            <div id="p-bankName"></div>
+            <div id="p-bankBranch" class="pre"></div>
+          </div>
+          <div class="invoice__sign">
+            <div>Hormat kami,</div>
+            <div id="p-signCompany" class="strong"></div>
+            <div class="invoice__sign-space"></div>
+            <div id="p-signName" class="invoice__sign-name"></div>
+          </div>
+        </div>
+        </div><!-- /#doc-invoice -->
+
+        <!-- ===== KWITANSI / RECEIPT ===== -->
+        <div id="doc-receipt" class="doc" hidden>
+          <div class="rcpt__head">
+            <h2 class="rcpt__title" id="r-title">RECEIPT</h2>
+            <table class="rcpt__meta">
+              <tr><td>No</td><td>:</td><td id="r-no"></td></tr>
+              <tr><td>Date</td><td>:</td><td id="r-date"></td></tr>
+            </table>
+          </div>
+          <table class="rcpt__body">
+            <tr><td class="rcpt__label">Received from</td><td>:</td><td id="r-from" class="pre"></td></tr>
+            <tr><td class="rcpt__label">The sum of</td><td>:</td><td id="r-sum" class="italic"></td></tr>
+            <tr><td class="rcpt__label">Being</td><td>:</td><td id="r-being" class="pre"></td></tr>
+          </table>
+          <div class="rcpt__foot">
+            <div class="rcpt__amount">Amount Rp. <span id="r-amount"></span></div>
+            <div class="rcpt__sign">
+              <div id="r-company" class="strong"></div>
+              <div class="invoice__sign-space"></div>
+              <div id="r-signName" class="invoice__sign-name"></div>
+            </div>
+          </div>
+        </div><!-- /#doc-receipt -->
+
+        <!-- ===== TANDA TERIMA ===== -->
+        <div id="doc-tandaterima" class="doc" hidden>
+          <h2 class="tt__title" id="t-title">TANDA TERIMA</h2>
+          <table class="rcpt__body">
+            <tr><td class="rcpt__label">Sudah diterima dari</td><td>:</td><td id="t-from"></td></tr>
+            <tr><td class="rcpt__label">Kepada</td><td>:</td><td id="t-to" class="pre"></td></tr>
+            <tr><td class="rcpt__label">Keterangan</td><td>:</td><td id="t-ket" class="pre"></td></tr>
+          </table>
+          <div class="tt__signs">
+            <div class="tt__sign">
+              <div>Yang Menyerahkan,</div>
+              <div class="invoice__sign-space"></div>
+              <div class="tt__line">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
+            </div>
+            <div class="tt__sign">
+              <div>Penerima,</div>
+              <div class="invoice__sign-space"></div>
+              <div class="tt__line">(&nbsp;&nbsp;&nbsp;Nama Jelas&nbsp;&nbsp;&nbsp;)</div>
+              <div>Tanggal: ..............</div>
+            </div>
+          </div>
+        </div><!-- /#doc-tandaterima -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-foot no-print">
+    Data tersimpan otomatis di browser Anda (localStorage). Gunakan "Cetak / Simpan PDF" lalu pilih <em>Save as PDF</em>.
+  </footer>
+<script>
+'use strict';
+
+/* ============================================================
+   Aplikasi Invoice — logika (vanilla JS, tanpa dependency)
+   ============================================================ */
+
+const STORAGE_KEY = 'invoice-app:data:v1';
+
+/* Logo contoh: perkiraan lambang kotak-kotak oranye (bisa diganti via upload) */
+const SAMPLE_LOGO = (() => {
+  const sq = [[54, 0], [81, 0], [54, 27], [81, 27], [27, 54], [54, 54], [0, 81], [27, 81]];
+  const rects = sq.map(([x, y]) =>
+    `<rect x='${x}' y='${y}' width='23' height='23' fill='none' stroke='#f5851f' stroke-width='2.6'/>`).join('');
+  return 'data:image/svg+xml,' + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='106' height='106' viewBox='0 0 106 106'>${rects}</svg>`);
+})();
+
+/* ---------- Contoh data (mengikuti kop surat & invoice referensi) ---------- */
+const EXAMPLE = {
+  docType: 'invoice',
+  receiptTitle: 'RECEIPT',
+  receiptNo: '054624',
+  logoDataUrl: SAMPLE_LOGO,
+  fromName: 'PT. JASA FERRIE PRATAMA',
+  tagline: 'ARCHITECTURE CONSULTANT',
+  brandColor: '#f5851f',
+  fromAddress: 'WISMA YAKYF, Lantai 2 Jl. Hj. Tutty Alawiyah\nNo. 99 Rt. 007 Rw. 005, Kalibata, Pancoran Jakarta Selatan 12740',
+  fromPhone: '+62 813 1818 299',
+  fromEmail: 'mail@jfp.co.id',
+  fromWeb: '',
+  invoiceNo: 'J/26-VI/18',
+  invoiceDate: '17 Juni 2026',
+  dueDays: '14',
+  toName: 'PT. Affinity Health Indonesia',
+  toName2: 'RS. Premier Jatinegara',
+  toAddress: 'Jl. Raya Jatinegara Timur No. 85-87\nJakarta 13310',
+  attnName: 'dr. Yustinus Hendry Yogatama, MM',
+  attnTitle: 'Director',
+  projectRef: '32504 : RS. PREMIER JATINEGARA : SUMUR RESAPAN : JAKARTA',
+  contractDate: '29 Agustus 2025',
+  contractNo: '32504/JFP-RSPJ/043/VIII/2025',
+  intro: '',
+  contractTotal: '66500000',
+  ppnRate: '11',
+  signName: 'Ir. Noordian Moeloek, M.Sc',
+  bankHolder: 'PT. JASA FERRIE PRATAMA',
+  bankAccount: '0011812342',
+  bankName: 'PT. Bank Negara Indonesia (Persero) Tbk',
+  bankBranch: 'Cabang Dukuh Bawah-Capem Setiabudi\nJalan HR. Rasuna Said Kav. 62\nJakarta 12920',
+  items: [
+    { desc: '20% berkala masa konstruksi', amount: '13300000' }
+  ]
+};
+
+const EMPTY = {
+  docType: 'invoice', receiptTitle: 'RECEIPT', receiptNo: '',
+  logoDataUrl: '',
+  fromName: '', tagline: '', brandColor: '#f5851f',
+  fromAddress: '', fromPhone: '', fromEmail: '', fromWeb: '',
+  invoiceNo: '', invoiceDate: '', dueDays: '14',
+  toName: '', toName2: '', toAddress: '', attnName: '', attnTitle: '',
+  projectRef: '', contractDate: '', contractNo: '', intro: '',
+  contractTotal: '', ppnRate: '11', signName: '',
+  bankHolder: '', bankAccount: '', bankName: '', bankBranch: '',
+  items: [{ desc: '', amount: '' }]
+};
+
+/* ---------- Util: format & terbilang ---------- */
+function toNumber(v) {
+  if (v === null || v === undefined) return 0;
+  const n = parseFloat(String(v).replace(/[^0-9.-]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+function formatRp(n) {
+  const rounded = Math.round(toNumber(n));
+  return 'Rp ' + rounded.toLocaleString('id-ID') + ',-';
+}
+
+/* Angka -> kata (Bahasa Indonesia), mendukung sampai triliunan */
+function terbilang(angka) {
+  angka = Math.floor(Math.abs(toNumber(angka)));
+  const satuan = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan',
+    'sepuluh', 'sebelas'];
+
+  function toWords(n) {
+    n = Math.floor(n);
+    if (n < 12) return satuan[n];
+    if (n < 20) return toWords(n - 10).trim() + ' belas';
+    if (n < 100) return (toWords(Math.floor(n / 10)) + ' puluh ' + toWords(n % 10)).trim();
+    if (n < 200) return ('seratus ' + toWords(n - 100)).trim();
+    if (n < 1000) return (toWords(Math.floor(n / 100)) + ' ratus ' + toWords(n % 100)).trim();
+    if (n < 2000) return ('seribu ' + toWords(n - 1000)).trim();
+    if (n < 1000000) return (toWords(Math.floor(n / 1000)) + ' ribu ' + toWords(n % 1000)).trim();
+    if (n < 1000000000) return (toWords(Math.floor(n / 1000000)) + ' juta ' + toWords(n % 1000000)).trim();
+    if (n < 1000000000000) return (toWords(Math.floor(n / 1000000000)) + ' miliar ' + toWords(n % 1000000000)).trim();
+    return (toWords(Math.floor(n / 1000000000000)) + ' triliun ' + toWords(n % 1000000000000)).trim();
+  }
+
+  if (angka === 0) return 'nol rupiah';
+  const words = toWords(angka).replace(/\s+/g, ' ').trim();
+  return words + ' rupiah';
+}
+
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+function titleCase(s) { return String(s || '').replace(/\S+/g, w => w.charAt(0).toUpperCase() + w.slice(1)); }
+function formatNum(n) { return Math.round(toNumber(n)).toLocaleString('id-ID') + ',-'; }
+
+/* ---------- State & DOM refs ---------- */
+const form = document.getElementById('invoice-form');
+const itemsContainer = document.getElementById('items');
+
+/* Logo disimpan sebagai data URL di luar FormData */
+let logoDataUrl = '';
+
+function updateLogoUI() {
+  const wrap = document.getElementById('logo-preview-wrap');
+  const img = document.getElementById('logo-preview');
+  if (logoDataUrl) {
+    img.src = logoDataUrl;
+    wrap.hidden = false;
+  } else {
+    img.removeAttribute('src');
+    wrap.hidden = true;
+  }
+}
+
+/* ---------- Line items ---------- */
+function addItemRow(desc = '', amount = '') {
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.innerHTML = `
+    <input type="text" class="item-desc" placeholder="Deskripsi tagihan" />
+    <input type="number" class="item-amount" min="0" step="1" placeholder="0" />
+    <button type="button" class="item-del" title="Hapus baris">&times;</button>`;
+  row.querySelector('.item-desc').value = desc;
+  row.querySelector('.item-amount').value = amount;
+  row.querySelector('.item-desc').addEventListener('input', render);
+  row.querySelector('.item-amount').addEventListener('input', render);
+  row.querySelector('.item-del').addEventListener('click', () => {
+    row.remove();
+    if (!itemsContainer.querySelector('.item-row')) addItemRow();
+    render();
+  });
+  itemsContainer.appendChild(row);
+}
+
+function readItems() {
+  return [...itemsContainer.querySelectorAll('.item-row')].map(r => ({
+    desc: r.querySelector('.item-desc').value,
+    amount: r.querySelector('.item-amount').value
+  }));
+}
+
+/* ---------- Read / write whole form ---------- */
+function readData() {
+  const data = {};
+  new FormData(form).forEach((v, k) => { data[k] = v; });
+  // FormData misses empty textareas sometimes; ensure all named fields captured
+  form.querySelectorAll('[name]').forEach(el => { data[el.name] = el.value; });
+  data.items = readItems();
+  data.logoDataUrl = logoDataUrl;
+  return data;
+}
+
+function fillData(data) {
+  form.querySelectorAll('[name]').forEach(el => {
+    if (data[el.name] !== undefined) el.value = data[el.name];
+  });
+  logoDataUrl = data.logoDataUrl || '';
+  updateLogoUI();
+  itemsContainer.innerHTML = '';
+  const items = (data.items && data.items.length) ? data.items : [{ desc: '', amount: '' }];
+  items.forEach(it => addItemRow(it.desc, it.amount));
+}
+
+/* ---------- Compute ---------- */
+function compute(data) {
+  const subtotal = (data.items || []).reduce((s, it) => s + toNumber(it.amount), 0);
+  const ppnRate = toNumber(data.ppnRate);
+  const ppn = subtotal * ppnRate / 100;
+  const total = subtotal + ppn;
+  return { subtotal, ppnRate, ppn, total };
+}
+
+/* ---------- Default intro text ---------- */
+function buildIntro(data) {
+  if (data.intro && data.intro.trim()) return data.intro.trim();
+  const contract = [];
+  if (data.contractDate) contract.push('tanggal ' + data.contractDate);
+  if (data.contractNo) contract.push('No. ' + data.contractNo);
+  const contractStr = contract.length ? ' (' + contract.join(', ') + ')' : '';
+  const parties = [data.fromName, data.toName].filter(Boolean).join(' dan ');
+  return `Menunjuk pada Perjanjian / Kontrak Penunjukan Konsultan` +
+    (parties ? ` antara ${parties}` : '') + contractStr +
+    `, bersama ini kami mengajukan tagihan sebagai berikut:`;
+}
+
+/* ---------- Render preview ---------- */
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value || '';
+}
+
+function render() {
+  const data = readData();
+  const { subtotal, ppnRate, ppn, total } = compute(data);
+
+  // Mini totals in form
+  setText('mini-subtotal', formatRp(subtotal));
+  setText('mini-ppn', formatRp(ppn));
+  setText('mini-total', formatRp(total));
+
+  // Kop surat / letterhead
+  document.getElementById('p-letterhead').style.setProperty('--lh-accent', data.brandColor || '#f5851f');
+  const logoEl = document.getElementById('p-logo');
+  if (logoDataUrl) { logoEl.src = logoDataUrl; logoEl.hidden = false; }
+  else { logoEl.removeAttribute('src'); logoEl.hidden = true; }
+  setText('p-fromName', data.fromName || '—');
+  const taglineEl = document.getElementById('p-tagline');
+  taglineEl.textContent = data.tagline || '';
+  taglineEl.style.display = data.tagline ? '' : 'none';
+  setText('p-fromAddress', data.fromAddress);
+  const contactsEl = document.getElementById('p-contacts');
+  const contacts = [];
+  if (data.fromPhone) contacts.push('Telp/WA: ' + data.fromPhone);
+  if (data.fromEmail) contacts.push('e-Mail: ' + data.fromEmail);
+  if (data.fromWeb) contacts.push(data.fromWeb);
+  contactsEl.innerHTML = contacts.map(c => `<span>${escapeHtml(c)}</span>`).join('');
+  contactsEl.style.display = contacts.length ? '' : 'none';
+
+  setText('p-invoiceNo', data.invoiceNo);
+  setText('p-invoiceDate', data.invoiceDate);
+
+  // Bill to
+  setText('p-toName', data.toName);
+  const toName2 = document.getElementById('p-toName2');
+  toName2.textContent = data.toName2 || '';
+  toName2.style.display = data.toName2 ? '' : 'none';
+  setText('p-toAddress', data.toAddress);
+  const attnEl = document.getElementById('p-attn');
+  if (data.attnName || data.attnTitle) {
+    attnEl.style.display = '';
+    attnEl.innerHTML = '<span class="strong">Attn: </span>' +
+      [data.attnName, data.attnTitle].filter(Boolean).join(' — ');
+  } else {
+    attnEl.style.display = 'none';
+  }
+
+  // Reference & intro
+  const refWrap = document.querySelector('.invoice__ref');
+  setText('p-projectRef', data.projectRef);
+  refWrap.style.display = data.projectRef ? '' : 'none';
+  setText('p-intro', buildIntro(data));
+
+  // Items table
+  const tbody = document.getElementById('p-items');
+  tbody.innerHTML = '';
+  // Optional "Total Kontrak" informational row
+  if (toNumber(data.contractTotal) > 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>Total Kontrak</td><td class="num">${formatRp(data.contractTotal)}</td>`;
+    tbody.appendChild(tr);
+  }
+  (data.items || []).forEach(it => {
+    if (!it.desc && !toNumber(it.amount)) return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escapeHtml(it.desc)}</td><td class="num">${formatRp(it.amount)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Totals
+  setText('p-subtotal', formatRp(subtotal));
+  setText('p-ppnLabel', `PPN ${ppnRate ? ppnRate + '%' : ''}`.trim());
+  setText('p-ppn', formatRp(ppn));
+  setText('p-total', formatRp(total));
+
+  // Terbilang
+  setText('p-terbilang', capitalize(terbilang(total)) + '.');
+
+  // Terms
+  const days = toNumber(data.dueDays);
+  setText('p-terms', days > 0
+    ? `Pembayaran harus dilakukan dalam waktu ${days} hari sejak tanggal faktur ini.`
+    : '');
+
+  // Bank & signature
+  setText('p-bankHolder', data.bankHolder);
+  setText('p-bankAccount', data.bankAccount ? 'Account No. : ' + data.bankAccount : '');
+  setText('p-bankName', data.bankName);
+  setText('p-bankBranch', data.bankBranch);
+  setText('p-signCompany', data.bankHolder || data.fromName);
+  setText('p-signName', data.signName);
+
+  // ---- Jenis dokumen: Invoice / Kwitansi / Tanda Terima ----
+  const type = data.docType || 'invoice';
+  ['invoice', 'receipt', 'tandaterima'].forEach(t => {
+    const el = document.getElementById('doc-' + t);
+    if (el) el.hidden = (t !== type);
+  });
+  const rf = document.getElementById('receipt-fields');
+  if (rf) rf.style.display = (type === 'receipt') ? '' : 'none';
+
+  const company = data.bankHolder || data.fromName;
+  const invRef = data.invoiceNo ? 'Invoice No. ' + data.invoiceNo : '';
+
+  // Kwitansi / Receipt
+  setText('r-title', data.receiptTitle || 'RECEIPT');
+  setText('r-no', data.receiptNo);
+  setText('r-date', data.invoiceDate);
+  setText('r-from', [data.toName, data.toName2].filter(Boolean).join('\n'));
+  setText('r-sum', titleCase(terbilang(total)));
+  setText('r-being', [invRef, data.projectRef].filter(Boolean).join('\n'));
+  setText('r-amount', formatNum(total));
+  setText('r-company', company);
+  setText('r-signName', data.signName);
+
+  // Tanda Terima
+  const attnLine = (data.attnName || data.attnTitle)
+    ? 'Attn: ' + [data.attnName, data.attnTitle].filter(Boolean).join(' — ') : '';
+  setText('t-from', data.fromName);
+  setText('t-to', [data.toName, data.toName2, data.toAddress, attnLine].filter(Boolean).join('\n'));
+  setText('t-ket', [invRef, data.projectRef].filter(Boolean).join('\n'));
+
+  // Persist
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+/* ---------- Load / actions ---------- */
+function loadInitial() {
+  let data = null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) data = JSON.parse(raw);
+  } catch (e) { /* ignore */ }
+  fillData(data || EXAMPLE);
+  render();
+}
+
+document.getElementById('btn-example').addEventListener('click', () => {
+  fillData(EXAMPLE); render();
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (confirm('Kosongkan semua isian?')) { fillData(EMPTY); render(); }
+});
+document.getElementById('btn-add-item').addEventListener('click', () => { addItemRow(); render(); });
+document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+/* Logo upload */
+document.getElementById('logo-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('File harus berupa gambar.'); e.target.value = ''; return; }
+  if (file.size > 1.5 * 1024 * 1024) {
+    alert('Ukuran logo maksimal 1,5 MB agar tersimpan dengan baik. Silakan perkecil gambar.');
+    e.target.value = ''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => { logoDataUrl = reader.result; updateLogoUI(); render(); };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+document.getElementById('btn-remove-logo').addEventListener('click', () => {
+  logoDataUrl = ''; updateLogoUI(); render();
+});
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const data = readData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'invoice-' + (data.invoiceNo || 'data').replace(/[^\w-]/g, '_') + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById('file-import').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try { fillData(JSON.parse(reader.result)); render(); }
+    catch (err) { alert('File JSON tidak valid.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// Re-render on any form input
+form.addEventListener('input', render);
+
+// Init
+loadInitial();
+
+</script>

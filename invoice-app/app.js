@@ -6,10 +6,25 @@
 
 const STORAGE_KEY = 'invoice-app:data:v1';
 
-/* ---------- Contoh data (mengikuti invoice referensi) ---------- */
+/* Logo contoh: perkiraan lambang kotak-kotak oranye (bisa diganti via upload) */
+const SAMPLE_LOGO = (() => {
+  const sq = [[54, 0], [81, 0], [54, 27], [81, 27], [27, 54], [54, 54], [0, 81], [27, 81]];
+  const rects = sq.map(([x, y]) =>
+    `<rect x='${x}' y='${y}' width='23' height='23' fill='none' stroke='#f5851f' stroke-width='2.6'/>`).join('');
+  return 'data:image/svg+xml,' + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='106' height='106' viewBox='0 0 106 106'>${rects}</svg>`);
+})();
+
+/* ---------- Contoh data (mengikuti kop surat & invoice referensi) ---------- */
 const EXAMPLE = {
-  fromName: 'PT. Jasa Ferrie Pratama',
-  fromAddress: '',
+  logoDataUrl: SAMPLE_LOGO,
+  fromName: 'PT. JASA FERRIE PRATAMA',
+  tagline: 'ARCHITECTURE CONSULTANT',
+  brandColor: '#f5851f',
+  fromAddress: 'WISMA YAKYF, Lantai 2 Jl. Hj. Tutty Alawiyah\nNo. 99 Rt. 007 Rw. 005, Kalibata, Pancoran Jakarta Selatan 12740',
+  fromPhone: '+62 813 1818 299',
+  fromEmail: 'mail@jfp.co.id',
+  fromWeb: '',
   invoiceNo: 'J/26-VI/18',
   invoiceDate: '17 Juni 2026',
   dueDays: '14',
@@ -35,7 +50,10 @@ const EXAMPLE = {
 };
 
 const EMPTY = {
-  fromName: '', fromAddress: '', invoiceNo: '', invoiceDate: '', dueDays: '14',
+  logoDataUrl: '',
+  fromName: '', tagline: '', brandColor: '#f5851f',
+  fromAddress: '', fromPhone: '', fromEmail: '', fromWeb: '',
+  invoiceNo: '', invoiceDate: '', dueDays: '14',
   toName: '', toName2: '', toAddress: '', attnName: '', attnTitle: '',
   projectRef: '', contractDate: '', contractNo: '', intro: '',
   contractTotal: '', ppnRate: '11', signName: '',
@@ -86,6 +104,21 @@ function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; 
 const form = document.getElementById('invoice-form');
 const itemsContainer = document.getElementById('items');
 
+/* Logo disimpan sebagai data URL di luar FormData */
+let logoDataUrl = '';
+
+function updateLogoUI() {
+  const wrap = document.getElementById('logo-preview-wrap');
+  const img = document.getElementById('logo-preview');
+  if (logoDataUrl) {
+    img.src = logoDataUrl;
+    wrap.hidden = false;
+  } else {
+    img.removeAttribute('src');
+    wrap.hidden = true;
+  }
+}
+
 /* ---------- Line items ---------- */
 function addItemRow(desc = '', amount = '') {
   const row = document.createElement('div');
@@ -120,6 +153,7 @@ function readData() {
   // FormData misses empty textareas sometimes; ensure all named fields captured
   form.querySelectorAll('[name]').forEach(el => { data[el.name] = el.value; });
   data.items = readItems();
+  data.logoDataUrl = logoDataUrl;
   return data;
 }
 
@@ -127,6 +161,8 @@ function fillData(data) {
   form.querySelectorAll('[name]').forEach(el => {
     if (data[el.name] !== undefined) el.value = data[el.name];
   });
+  logoDataUrl = data.logoDataUrl || '';
+  updateLogoUI();
   itemsContainer.innerHTML = '';
   const items = (data.items && data.items.length) ? data.items : [{ desc: '', amount: '' }];
   items.forEach(it => addItemRow(it.desc, it.amount));
@@ -169,9 +205,24 @@ function render() {
   setText('mini-ppn', formatRp(ppn));
   setText('mini-total', formatRp(total));
 
-  // Header / from
+  // Kop surat / letterhead
+  document.getElementById('p-letterhead').style.setProperty('--lh-accent', data.brandColor || '#f5851f');
+  const logoEl = document.getElementById('p-logo');
+  if (logoDataUrl) { logoEl.src = logoDataUrl; logoEl.hidden = false; }
+  else { logoEl.removeAttribute('src'); logoEl.hidden = true; }
   setText('p-fromName', data.fromName || '—');
+  const taglineEl = document.getElementById('p-tagline');
+  taglineEl.textContent = data.tagline || '';
+  taglineEl.style.display = data.tagline ? '' : 'none';
   setText('p-fromAddress', data.fromAddress);
+  const contactsEl = document.getElementById('p-contacts');
+  const contacts = [];
+  if (data.fromPhone) contacts.push('Telp/WA: ' + data.fromPhone);
+  if (data.fromEmail) contacts.push('e-Mail: ' + data.fromEmail);
+  if (data.fromWeb) contacts.push(data.fromWeb);
+  contactsEl.innerHTML = contacts.map(c => `<span>${escapeHtml(c)}</span>`).join('');
+  contactsEl.style.display = contacts.length ? '' : 'none';
+
   setText('p-invoiceNo', data.invoiceNo);
   setText('p-invoiceDate', data.invoiceDate);
 
@@ -264,6 +315,24 @@ document.getElementById('btn-reset').addEventListener('click', () => {
 });
 document.getElementById('btn-add-item').addEventListener('click', () => { addItemRow(); render(); });
 document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+/* Logo upload */
+document.getElementById('logo-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('File harus berupa gambar.'); e.target.value = ''; return; }
+  if (file.size > 1.5 * 1024 * 1024) {
+    alert('Ukuran logo maksimal 1,5 MB agar tersimpan dengan baik. Silakan perkecil gambar.');
+    e.target.value = ''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => { logoDataUrl = reader.result; updateLogoUI(); render(); };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+document.getElementById('btn-remove-logo').addEventListener('click', () => {
+  logoDataUrl = ''; updateLogoUI(); render();
+});
 
 document.getElementById('btn-export').addEventListener('click', () => {
   const data = readData();

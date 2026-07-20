@@ -31,12 +31,38 @@
       <form id="invoice-form">
 
         <fieldset>
-          <legend>Penerbit (Dari)</legend>
-          <label>Nama Perusahaan
-            <input type="text" name="fromName" placeholder="PT. Jasa Ferrie Pratama" />
+          <legend>Kop Surat / Penerbit</legend>
+          <label>Logo Perusahaan
+            <input type="file" id="logo-input" accept="image/*" />
           </label>
-          <label>Alamat / Baris tambahan
-            <textarea name="fromAddress" rows="2" placeholder="Alamat perusahaan penerbit"></textarea>
+          <div id="logo-preview-wrap" class="logo-preview-wrap" hidden>
+            <img id="logo-preview" alt="Pratinjau logo" />
+            <button type="button" id="btn-remove-logo" class="btn btn--ghost btn--sm">Hapus logo</button>
+          </div>
+          <label>Nama Perusahaan
+            <input type="text" name="fromName" placeholder="PT. JASA FERRIE PRATAMA" />
+          </label>
+          <div class="grid-2">
+            <label>Tagline / Bidang Usaha
+              <input type="text" name="tagline" placeholder="ARCHITECTURE CONSULTANT" />
+            </label>
+            <label>Warna Kop
+              <input type="color" name="brandColor" value="#f5851f" class="color-input" />
+            </label>
+          </div>
+          <label>Alamat
+            <textarea name="fromAddress" rows="2" placeholder="WISMA YAKYF, Lantai 2 Jl. Hj. Tutty Alawiyah, Jakarta Selatan"></textarea>
+          </label>
+          <div class="grid-2">
+            <label>Telepon / WA
+              <input type="text" name="fromPhone" placeholder="+62 813 1818 299" />
+            </label>
+            <label>Email
+              <input type="text" name="fromEmail" placeholder="mail@jfp.co.id" />
+            </label>
+          </div>
+          <label>Website
+            <input type="text" name="fromWeb" placeholder="www.jfp.co.id" />
           </label>
         </fieldset>
 
@@ -146,11 +172,18 @@
     <!-- ===================== PREVIEW ===================== -->
     <section class="panel preview-panel" aria-label="Pratinjau invoice">
       <div id="invoice" class="invoice">
-        <div class="invoice__header">
-          <div>
-            <div class="invoice__from" id="p-fromName">PT. Jasa Ferrie Pratama</div>
+        <!-- ===== KOP SURAT / LETTERHEAD ===== -->
+        <div class="invoice__letterhead" id="p-letterhead">
+          <img class="invoice__logo" id="p-logo" alt="Logo perusahaan" hidden />
+          <div class="invoice__lh-text">
+            <div class="invoice__from" id="p-fromName">PT. JASA FERRIE PRATAMA</div>
+            <div class="invoice__tagline" id="p-tagline"></div>
             <div class="invoice__from-addr" id="p-fromAddress"></div>
+            <div class="invoice__contacts" id="p-contacts"></div>
           </div>
+        </div>
+
+        <div class="invoice__header">
           <div class="invoice__title">
             <h2>INVOICE</h2>
             <table class="invoice__meta">

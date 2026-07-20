@@ -6,6 +6,7 @@ tanpa server dan tanpa dependency — cukup buka `index.html` di browser.
 
 ## Fitur
 
+- **Kop surat resmi (letterhead)**: upload **logo perusahaan**, nama, **tagline/bidang usaha**, alamat, telepon/WA, email, website, dan **pemilih warna kop** — tampil di bagian atas invoice dengan garis pembatas. Logo tertanam permanen (tersimpan & ikut saat ekspor JSON / cetak PDF).
 - **Form isian lengkap**: data penerbit, nomor & tanggal invoice, data klien (Ditagihkan Kepada + Attn), referensi proyek/kontrak.
 - **Pratinjau langsung (live preview)** dalam format invoice resmi ukuran A4.
 - **Rincian tagihan fleksibel**: baris item bisa ditambah/dihapus, nilai Total Kontrak (informasi), dan **PPN otomatis** (default 11%).

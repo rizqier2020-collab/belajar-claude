@@ -104,6 +104,19 @@ textarea { resize: vertical; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .mt { margin-top: 6px; }
 
+.logo-preview-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  margin-bottom: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #f6f8fc;
+}
+.logo-preview-wrap img { max-height: 56px; max-width: 100px; object-fit: contain; }
+.color-input { height: 38px; padding: 3px; cursor: pointer; }
+
 /* line items rows */
 .items-head, .item-row {
   display: grid;
@@ -144,17 +157,63 @@ textarea { resize: vertical; }
   font-size: 12.5pt;
   border: 1px solid var(--line);
 }
+/* ----- Kop surat / letterhead ----- */
+.invoice__letterhead {
+  --lh-accent: #f5851f;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2.5px solid var(--lh-accent);
+  margin-bottom: 4px;
+}
+.invoice__logo {
+  max-height: 80px;
+  max-width: 130px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+.invoice__lh-text { flex: 1 1 auto; }
+.invoice__from {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 21pt;
+  font-weight: 800;
+  letter-spacing: .5px;
+  line-height: 1.05;
+  color: var(--lh-accent);
+}
+.invoice__tagline {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--lh-accent);
+  margin-top: 1px;
+}
+.invoice__from-addr {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: var(--lh-accent);
+  filter: brightness(1.08);
+  white-space: pre-line;
+  margin-top: 6px;
+}
+.invoice__contacts {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: var(--lh-accent);
+  filter: brightness(1.08);
+  margin-top: 2px;
+}
+.invoice__contacts span + span::before { content: ",  "; }
+
 .invoice__header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-start;
   gap: 20px;
-  border-bottom: 2px solid #222;
-  padding-bottom: 12px;
-  margin-bottom: 18px;
+  margin: 14px 0 18px;
 }
-.invoice__from { font-size: 15pt; font-weight: 700; }
-.invoice__from-addr { font-size: 10.5pt; color: #333; white-space: pre-line; margin-top: 2px; }
 .invoice__title { text-align: right; }
 .invoice__title h2 { margin: 0 0 6px; letter-spacing: 3px; font-size: 22pt; }
 .invoice__meta { font-size: 11.5pt; margin-left: auto; }
@@ -211,6 +270,11 @@ textarea { resize: vertical; }
 @media print {
   body { background: #fff; }
   .no-print { display: none !important; }
+  .invoice__letterhead, .invoice__from, .invoice__tagline,
+  .invoice__from-addr, .invoice__contacts, .invoice__logo {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   .layout { display: block; padding: 0; margin: 0; max-width: none; }
   .panel { border: none; box-shadow: none; }
   .preview-panel { padding: 0; overflow: visible; }

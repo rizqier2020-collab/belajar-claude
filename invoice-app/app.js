@@ -17,6 +17,9 @@ const SAMPLE_LOGO = (() => {
 
 /* ---------- Contoh data (mengikuti kop surat & invoice referensi) ---------- */
 const EXAMPLE = {
+  docType: 'invoice',
+  receiptTitle: 'RECEIPT',
+  receiptNo: '054624',
   logoDataUrl: SAMPLE_LOGO,
   fromName: 'PT. JASA FERRIE PRATAMA',
   tagline: 'ARCHITECTURE CONSULTANT',
@@ -50,6 +53,7 @@ const EXAMPLE = {
 };
 
 const EMPTY = {
+  docType: 'invoice', receiptTitle: 'RECEIPT', receiptNo: '',
   logoDataUrl: '',
   fromName: '', tagline: '', brandColor: '#f5851f',
   fromAddress: '', fromPhone: '', fromEmail: '', fromWeb: '',
@@ -99,6 +103,8 @@ function terbilang(angka) {
 }
 
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+function titleCase(s) { return String(s || '').replace(/\S+/g, w => w.charAt(0).toUpperCase() + w.slice(1)); }
+function formatNum(n) { return Math.round(toNumber(n)).toLocaleString('id-ID') + ',-'; }
 
 /* ---------- State & DOM refs ---------- */
 const form = document.getElementById('invoice-form');
@@ -285,6 +291,36 @@ function render() {
   setText('p-bankBranch', data.bankBranch);
   setText('p-signCompany', data.bankHolder || data.fromName);
   setText('p-signName', data.signName);
+
+  // ---- Jenis dokumen: Invoice / Kwitansi / Tanda Terima ----
+  const type = data.docType || 'invoice';
+  ['invoice', 'receipt', 'tandaterima'].forEach(t => {
+    const el = document.getElementById('doc-' + t);
+    if (el) el.hidden = (t !== type);
+  });
+  const rf = document.getElementById('receipt-fields');
+  if (rf) rf.style.display = (type === 'receipt') ? '' : 'none';
+
+  const company = data.bankHolder || data.fromName;
+  const invRef = data.invoiceNo ? 'Invoice No. ' + data.invoiceNo : '';
+
+  // Kwitansi / Receipt
+  setText('r-title', data.receiptTitle || 'RECEIPT');
+  setText('r-no', data.receiptNo);
+  setText('r-date', data.invoiceDate);
+  setText('r-from', [data.toName, data.toName2].filter(Boolean).join('\n'));
+  setText('r-sum', titleCase(terbilang(total)));
+  setText('r-being', [invRef, data.projectRef].filter(Boolean).join('\n'));
+  setText('r-amount', formatNum(total));
+  setText('r-company', company);
+  setText('r-signName', data.signName);
+
+  // Tanda Terima
+  const attnLine = (data.attnName || data.attnTitle)
+    ? 'Attn: ' + [data.attnName, data.attnTitle].filter(Boolean).join(' — ') : '';
+  setText('t-from', data.fromName);
+  setText('t-to', [data.toName, data.toName2, data.toAddress, attnLine].filter(Boolean).join('\n'));
+  setText('t-ket', [invRef, data.projectRef].filter(Boolean).join('\n'));
 
   // Persist
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* ignore */ }

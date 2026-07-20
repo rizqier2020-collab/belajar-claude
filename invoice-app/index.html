@@ -31,6 +31,25 @@
       <form id="invoice-form">
 
         <fieldset>
+          <legend>Jenis Dokumen</legend>
+          <label>Buat dokumen
+            <select name="docType" id="doc-type">
+              <option value="invoice">Invoice</option>
+              <option value="receipt">Kwitansi (Receipt)</option>
+              <option value="tandaterima">Tanda Terima</option>
+            </select>
+          </label>
+          <div class="grid-2" id="receipt-fields">
+            <label>Judul Kwitansi
+              <input type="text" name="receiptTitle" placeholder="RECEIPT" />
+            </label>
+            <label>No. Kwitansi
+              <input type="text" name="receiptNo" placeholder="054624" />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
           <legend>Kop Surat / Penerbit</legend>
           <label>Logo Perusahaan
             <input type="file" id="logo-input" accept="image/*" />
@@ -183,6 +202,7 @@
           </div>
         </div>
 
+        <div id="doc-invoice" class="doc">
         <div class="invoice__header">
           <div class="invoice__title">
             <table class="invoice__meta">
@@ -238,6 +258,54 @@
             <div id="p-signName" class="invoice__sign-name"></div>
           </div>
         </div>
+        </div><!-- /#doc-invoice -->
+
+        <!-- ===== KWITANSI / RECEIPT ===== -->
+        <div id="doc-receipt" class="doc" hidden>
+          <div class="rcpt__head">
+            <h2 class="rcpt__title" id="r-title">RECEIPT</h2>
+            <table class="rcpt__meta">
+              <tr><td>No</td><td>:</td><td id="r-no"></td></tr>
+              <tr><td>Date</td><td>:</td><td id="r-date"></td></tr>
+            </table>
+          </div>
+          <table class="rcpt__body">
+            <tr><td class="rcpt__label">Received from</td><td>:</td><td id="r-from" class="pre"></td></tr>
+            <tr><td class="rcpt__label">The sum of</td><td>:</td><td id="r-sum" class="italic"></td></tr>
+            <tr><td class="rcpt__label">Being</td><td>:</td><td id="r-being" class="pre"></td></tr>
+          </table>
+          <div class="rcpt__foot">
+            <div class="rcpt__amount">Amount Rp. <span id="r-amount"></span></div>
+            <div class="rcpt__sign">
+              <div id="r-company" class="strong"></div>
+              <div class="invoice__sign-space"></div>
+              <div id="r-signName" class="invoice__sign-name"></div>
+            </div>
+          </div>
+        </div><!-- /#doc-receipt -->
+
+        <!-- ===== TANDA TERIMA ===== -->
+        <div id="doc-tandaterima" class="doc" hidden>
+          <h2 class="tt__title" id="t-title">TANDA TERIMA</h2>
+          <table class="rcpt__body">
+            <tr><td class="rcpt__label">Sudah diterima dari</td><td>:</td><td id="t-from"></td></tr>
+            <tr><td class="rcpt__label">Kepada</td><td>:</td><td id="t-to" class="pre"></td></tr>
+            <tr><td class="rcpt__label">Keterangan</td><td>:</td><td id="t-ket" class="pre"></td></tr>
+          </table>
+          <div class="tt__signs">
+            <div class="tt__sign">
+              <div>Yang Menyerahkan,</div>
+              <div class="invoice__sign-space"></div>
+              <div class="tt__line">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
+            </div>
+            <div class="tt__sign">
+              <div>Penerima,</div>
+              <div class="invoice__sign-space"></div>
+              <div class="tt__line">(&nbsp;&nbsp;&nbsp;Nama Jelas&nbsp;&nbsp;&nbsp;)</div>
+              <div>Tanggal: ..............</div>
+            </div>
+          </div>
+        </div><!-- /#doc-tandaterima -->
       </div>
     </section>
   </main>

@@ -51,43 +51,48 @@ export default function DataTable({ columns, data, searchKeys = [], pageSize = 1
   return (
     <div>
       {searchKeys.length > 0 && (
-        <div className="mb-3 flex items-center gap-2">
-          <input
-            className="input max-w-xs"
-            placeholder="Cari..."
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setPage(1)
-            }}
-          />
+        <div className="mb-4 flex items-center gap-2">
+          <div className="relative max-w-xs flex-1">
+            <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+            </svg>
+            <input
+              className="input pl-9"
+              placeholder="Cari..."
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setPage(1)
+              }}
+            />
+          </div>
           {actions}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200/70 bg-white shadow-card">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
+          <thead className="border-b border-slate-100 bg-slate-50/80 text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
               {columns.map((c) => (
                 <th
                   key={c.key}
-                  className={`px-4 py-3 font-semibold ${c.sortable ? 'cursor-pointer select-none' : ''}`}
+                  className={`whitespace-nowrap px-4 py-3.5 font-semibold ${c.sortable ? 'cursor-pointer select-none transition hover:text-slate-700' : ''}`}
                   onClick={c.sortable ? () => toggleSort(c.key) : undefined}
                 >
                   {c.header}
                   {c.sortable && sortKey === c.key && (
-                    <span className="ml-1">{sortDir === 'asc' ? '▲' : '▼'}</span>
+                    <span className="ml-1 text-primary">{sortDir === 'asc' ? '▲' : '▼'}</span>
                   )}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-slate-100">
             {pageRows.map((row, i) => (
-              <tr key={row.id ?? i} className="hover:bg-gray-50">
+              <tr key={row.id ?? i} className="transition-colors hover:bg-slate-50/70">
                 {columns.map((c) => (
-                  <td key={c.key} className="px-4 py-3 align-middle text-gray-700">
+                  <td key={c.key} className="px-4 py-3.5 align-middle text-slate-700">
                     {c.render ? c.render(row) : row[c.key]}
                   </td>
                 ))}
@@ -99,21 +104,21 @@ export default function DataTable({ columns, data, searchKeys = [], pageSize = 1
       </div>
 
       {totalPages > 1 && (
-        <div className="mt-3 flex items-center justify-between text-sm text-gray-500">
+        <div className="mt-4 flex items-center justify-between text-sm text-slate-500">
           <span>
             Menampilkan {(current - 1) * pageSize + 1}–{Math.min(current * pageSize, filtered.length)} dari {filtered.length}
           </span>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
             <button
-              className="btn-secondary !py-1 !px-2"
+              className="btn-secondary !px-2.5 !py-1.5"
               disabled={current === 1}
               onClick={() => setPage(current - 1)}
             >
               ‹
             </button>
-            <span className="px-2 py-1">{current} / {totalPages}</span>
+            <span className="px-3 py-1 font-medium text-slate-600">{current} / {totalPages}</span>
             <button
-              className="btn-secondary !py-1 !px-2"
+              className="btn-secondary !px-2.5 !py-1.5"
               disabled={current === totalPages}
               onClick={() => setPage(current + 1)}
             >
